@@ -7,37 +7,51 @@
       </div>
 
       <div class="top-bar__controls">
-        <nav class="mode-toggle" aria-label="選擇模式">
-          <button
-            v-for="mode in modes"
-            :key="mode.id"
-            type="button"
-            class="mode-toggle__button"
-            :class="{ 'mode-toggle__button--active': activeMode === mode.id }"
-            @click="selectMode(mode.id)"
-          >
-            {{ mode.label }}
-          </button>
-        </nav>
+        <button
+          v-if="isCompactScreen"
+          type="button"
+          class="controls-toggle"
+          @click="toggleControls"
+        >
+          {{ showControls ? '隱藏選單' : '顯示選單' }}
+        </button>
 
-        <button type="button" class="history-button" @click="openHistory">查看歷史紀錄</button>
+        <div
+          class="top-bar__controls-content"
+          :class="{ 'top-bar__controls-content--collapsed': isCompactScreen && !showControls }"
+        >
+          <nav class="mode-toggle" aria-label="選擇模式">
+            <button
+              v-for="mode in modes"
+              :key="mode.id"
+              type="button"
+              class="mode-toggle__button"
+              :class="{ 'mode-toggle__button--active': activeMode === mode.id }"
+              @click="selectMode(mode.id)"
+            >
+              {{ mode.label }}
+            </button>
+          </nav>
 
-        <template v-if="activeMode === 'practice'">
-          <label class="level-picker">
-            <span>選擇等級</span>
-            <select :value="String(activeLevel)" @change="onLevelChange">
-              <option v-for="option in levelOptions" :key="option" :value="String(option)">
-                {{ option }} 級
-              </option>
-            </select>
-          </label>
-          <div class="progress">
-            <span class="progress__label">已完成 {{ progress.asked }} 題</span>
-            <div class="progress__bar">
-              <div class="progress__bar-fill" :style="{ width: progress.completion + '%' }"></div>
+          <button type="button" class="history-button" @click="openHistory">查看歷史紀錄</button>
+
+          <template v-if="activeMode === 'practice'">
+            <label class="level-picker">
+              <span>選擇等級</span>
+              <select :value="String(activeLevel)" @change="onLevelChange">
+                <option v-for="option in levelOptions" :key="option" :value="String(option)">
+                  {{ option }} 級
+                </option>
+              </select>
+            </label>
+            <div class="progress">
+              <span class="progress__label">已完成 {{ progress.asked }} 題</span>
+              <div class="progress__bar">
+                <div class="progress__bar-fill" :style="{ width: progress.completion + '%' }"></div>
+              </div>
             </div>
-          </div>
-        </template>
+          </template>
+        </div>
       </div>
     </header>
 
@@ -78,7 +92,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import QuizCard from '@/components/QuizCard.vue';
 import ExamMode from '@/components/ExamMode.vue';
@@ -99,10 +113,26 @@ const modes = [
 
 const activeMode = ref(null);
 const showHistory = ref(false);
+const isCompactScreen = ref(false);
+const showControls = ref(true);
+
+let mediaCleanup = null;
 
 watch(activeMode, (mode) => {
   if (mode === 'practice') {
     quizStore.initialize();
+    if (isCompactScreen.value) {
+      showControls.value = true;
+    }
+  }
+
+  if (mode === 'exam' && isCompactScreen.value) {
+    showControls.value = false;
+    return;
+  }
+
+  if (!mode && isCompactScreen.value) {
+    showControls.value = true;
   }
 });
 
@@ -140,6 +170,39 @@ function openHistory() {
 function closeHistory() {
   showHistory.value = false;
 }
+
+function toggleControls() {
+  showControls.value = !showControls.value;
+}
+
+onMounted(() => {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+  const query = window.matchMedia('(max-width: 640px)');
+
+  const handleChange = () => {
+    isCompactScreen.value = query.matches;
+    if (!query.matches) {
+      showControls.value = true;
+      return;
+    }
+    if (activeMode.value === 'exam') {
+      showControls.value = false;
+    } else {
+      showControls.value = true;
+    }
+  };
+
+  handleChange();
+  query.addEventListener('change', handleChange);
+  mediaCleanup = () => query.removeEventListener('change', handleChange);
+});
+
+onBeforeUnmount(() => {
+  if (mediaCleanup) {
+    mediaCleanup();
+    mediaCleanup = null;
+  }
+});
 </script>
 
 <style scoped lang="scss">
@@ -190,6 +253,17 @@ function closeHistory() {
   gap: 1rem;
 }
 
+.top-bar__controls-content {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.top-bar__controls-content--collapsed {
+  display: none;
+}
+
 .mode-toggle {
   display: inline-flex;
   padding: 0.25rem;
@@ -230,6 +304,21 @@ function closeHistory() {
 .history-button:hover {
   background: rgba(148, 163, 184, 0.3);
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+}
+
+.controls-toggle {
+  border: none;
+  border-radius: 999px;
+  padding: 0.35rem 1rem;
+  background: rgba(148, 163, 184, 0.25);
+  color: var(--brand-color-dark);
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.controls-toggle:hover {
+  background: rgba(148, 163, 184, 0.35);
 }
 
 .level-picker {
@@ -377,6 +466,12 @@ function closeHistory() {
     align-items: stretch;
   }
 
+  .top-bar__controls-content {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .progress {
     min-width: 140px;
   }
@@ -402,6 +497,10 @@ function closeHistory() {
     gap: 0.75rem;
   }
 
+  .controls-toggle {
+    width: 100%;
+  }
+
   .history-button {
     width: 100%;
     text-align: center;
@@ -409,10 +508,11 @@ function closeHistory() {
 
   .progress {
     width: 100%;
+    min-width: 0;
   }
 
   .app-main {
-    padding: 0.75rem 1rem 2.25rem;
+    padding: 0.5rem 1rem 2rem;
   }
 }
 
