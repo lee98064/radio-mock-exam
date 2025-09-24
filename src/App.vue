@@ -76,10 +76,11 @@ function handleNext() {
 
 <style scoped lang="scss">
 .app-shell {
-  min-height: 100vh;
+  min-height: 100svh;
   display: flex;
   flex-direction: column;
   background: linear-gradient(160deg, #eff6ff 0%, #ffffff 40%, #e2e8f0 100%);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .top-bar {
@@ -168,7 +169,10 @@ function handleNext() {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: clamp(1rem, 5vw, 3rem);
+  padding: clamp(1rem, 4vw, 3rem) clamp(0.75rem, 5vw, 3rem) clamp(2rem, 6vw, 4rem);
+  width: min(100%, 960px);
+  margin: 0 auto;
+  overflow-y: auto;
 }
 
 .empty-state {
@@ -185,8 +189,15 @@ function handleNext() {
   color: var(--text);
 }
 
+@media (max-width: 920px) {
+  .app-main {
+    width: 100%;
+  }
+}
+
 @media (max-width: 768px) {
   .top-bar {
+    gap: 1rem;
     padding: 1rem 1.25rem;
   }
 
@@ -200,30 +211,50 @@ function handleNext() {
   }
 
   .app-main {
-    padding: 1rem;
+    padding: 1rem 1.25rem 2.5rem;
   }
 }
 
-@media (max-width: 480px) {
-  .top-bar__controls {
+@media (max-width: 600px) {
+  .app-shell {
+    min-height: 100dvh;
+  }
+
+  .top-bar {
     flex-direction: column;
     align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+  }
+
+  .top-bar__controls {
+    gap: 0.75rem;
   }
 
   .progress {
     width: 100%;
   }
 
-  .progress__bar {
-    height: 0.5rem;
+  .app-main {
+    padding: 0.75rem 1rem 2.25rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .top-bar__brand {
+    gap: 0.25rem;
   }
 
-  .level-picker select {
-    width: 100%;
+  .brand__title {
+    font-size: 1.2rem;
+  }
+
+  .brand__subtitle {
+    font-size: 0.8rem;
   }
 
   .app-main {
-    padding: 1rem 0.75rem 2rem;
+    padding: 0.75rem 0.85rem 2rem;
   }
 }
 </style>
