@@ -32,6 +32,15 @@
 
     <footer class="quiz-card__footer">
       <button
+        v-if="showBackButton"
+        class="back-button"
+        type="button"
+        :disabled="!canGoBack"
+        @click="emit('back')"
+      >
+        上一題
+      </button>
+      <button
         class="next-button"
         type="button"
         :disabled="!isCorrect"
@@ -62,10 +71,18 @@ const props = defineProps({
   revealExplanation: {
     type: Boolean,
     default: false
+  },
+  showBackButton: {
+    type: Boolean,
+    default: false
+  },
+  canGoBack: {
+    type: Boolean,
+    default: false
   }
 });
 
-const emit = defineEmits(['answer', 'next']);
+const emit = defineEmits(['answer', 'next', 'back']);
 
 const explanationLines = computed(() => {
   if (!props.question?.explanation) return [];
@@ -217,7 +234,29 @@ function isChoiceDisabled(choiceIndex) {
 
 .quiz-card__footer {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.back-button {
+  padding: 0.65rem 1.35rem;
+  border: none;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.25);
+  color: var(--text-muted);
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.back-button:enabled:hover {
+  background: rgba(148, 163, 184, 0.35);
+  color: var(--text);
+}
+
+.back-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .next-button {
@@ -257,6 +296,18 @@ function isChoiceDisabled(choiceIndex) {
     padding: 1.1rem;
     border-radius: 1rem;
     box-shadow: 0 8px 18px rgba(15, 23, 42, 0.1);
+  }
+
+  .quiz-card__footer {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+
+  .back-button,
+  .next-button {
+    width: 100%;
+    text-align: center;
   }
 
   .choice {
