@@ -1,0 +1,30 @@
+:root {
+  color-scheme: light dark;
+  font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+  --brand-color: #2563eb;
+  --brand-color-dark: #1d4ed8;
+  --surface: #ffffff;
+  --surface-muted: #f3f4f6;
+  --text: #111827;
+  --text-muted: #4b5563;
+  --correct: #16a34a;
+  --incorrect: #dc2626;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--surface-muted);
+  color: var(--text);
+}
+
+#app {
+  min-height: 100vh;
+}
+
+button {
+  font: inherit;
+}
