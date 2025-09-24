@@ -96,6 +96,8 @@ function isChoiceDisabled(choiceIndex) {
   background: var(--surface);
   border-radius: 1.25rem;
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+  width: 100%;
+  max-width: 720px;
 }
 
 .quiz-card__header {
@@ -251,12 +253,51 @@ function isChoiceDisabled(choiceIndex) {
 
 @media (max-width: 640px) {
   .quiz-card {
-    padding: 1.25rem;
+    gap: 1.1rem;
+    padding: 1.1rem;
     border-radius: 1rem;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.1);
   }
 
   .choice {
-    padding: 0.85rem;
+    gap: 0.75rem;
+    padding: 0.75rem 0.85rem;
+  }
+
+  .quiz-card__prompt {
+    font-size: 1.15rem;
+  }
+
+  .choice__index {
+    width: 2rem;
+    height: 2rem;
+    font-size: 1rem;
+  }
+
+  .choice__text {
+    font-size: 0.95rem;
+  }
+
+  .next-button {
+    padding: 0.65rem 1.35rem;
+  }
+}
+
+@media (max-height: 700px) and (max-width: 640px) {
+  .quiz-card {
+    gap: 1rem;
+  }
+
+  .quiz-card__header {
+    gap: 0.5rem;
+  }
+
+  .quiz-card__meta {
+    font-size: 0.85rem;
+  }
+
+  .quiz-card__prompt {
+    font-size: 1.05rem;
   }
 }
 </style>
