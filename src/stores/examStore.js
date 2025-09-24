@@ -128,6 +128,8 @@ export const useExamStore = defineStore('exam', {
       let correct = 0;
       const details = this.questions.map((question, index) => {
         const response = this.responses[index] ?? { selectedIndex: null };
+        const selectedChoice = question.choices.find((choice) => choice.index === response.selectedIndex) ?? null;
+        const correctChoice = question.choices.find((choice) => choice.index === question.answerIndex) ?? null;
         const isCorrect = response.selectedIndex === question.answerIndex;
         if (isCorrect) correct += 1;
         return {
@@ -136,6 +138,8 @@ export const useExamStore = defineStore('exam', {
           level: question.level,
           selectedIndex: response.selectedIndex,
           correctIndex: question.answerIndex,
+          selectedText: selectedChoice?.text ?? null,
+          correctText: correctChoice?.text ?? null,
           isCorrect
         };
       });
@@ -170,7 +174,9 @@ export const useExamStore = defineStore('exam', {
           id: detail.id,
           prompt: detail.prompt,
           selectedIndex: detail.selectedIndex,
+          selectedText: detail.selectedText,
           correctIndex: detail.correctIndex,
+          correctText: detail.correctText,
           isCorrect: detail.isCorrect
         }))
       };

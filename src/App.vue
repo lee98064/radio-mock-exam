@@ -20,6 +20,8 @@
           </button>
         </nav>
 
+        <button type="button" class="history-button" @click="openHistory">查看歷史紀錄</button>
+
         <template v-if="activeMode === 'practice'">
           <label class="level-picker">
             <span>選擇等級</span>
@@ -71,6 +73,7 @@
 
       <ExamMode v-else @exit="handleExitExam" />
     </main>
+    <HistoryPanel :open="showHistory" @close="closeHistory" />
   </div>
 </template>
 
@@ -79,6 +82,7 @@ import { computed, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import QuizCard from '@/components/QuizCard.vue';
 import ExamMode from '@/components/ExamMode.vue';
+import HistoryPanel from '@/components/HistoryPanel.vue';
 import { useQuizStore } from '@/stores/quizStore';
 
 const quizStore = useQuizStore();
@@ -94,6 +98,7 @@ const modes = [
 ];
 
 const activeMode = ref(null);
+const showHistory = ref(false);
 
 watch(activeMode, (mode) => {
   if (mode === 'practice') {
@@ -126,6 +131,14 @@ function handleBack() {
 
 function handleExitExam() {
   activeMode.value = null;
+}
+
+function openHistory() {
+  showHistory.value = true;
+}
+
+function closeHistory() {
+  showHistory.value = false;
 }
 </script>
 
@@ -173,7 +186,8 @@ function handleExitExam() {
 .top-bar__controls {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .mode-toggle {
@@ -182,6 +196,7 @@ function handleExitExam() {
   border-radius: 999px;
   background: rgba(148, 163, 184, 0.16);
   gap: 0.25rem;
+  flex-shrink: 0;
 }
 
 .mode-toggle__button {
@@ -200,6 +215,23 @@ function handleExitExam() {
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.18);
 }
 
+.history-button {
+  border: none;
+  border-radius: 999px;
+  padding: 0.45rem 1.2rem;
+  background: rgba(148, 163, 184, 0.2);
+  color: var(--brand-color-dark);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+  flex-shrink: 0;
+}
+
+.history-button:hover {
+  background: rgba(148, 163, 184, 0.3);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+}
+
 .level-picker {
   display: flex;
   flex-direction: column;
@@ -215,6 +247,7 @@ function handleExitExam() {
   border: 1px solid rgba(148, 163, 184, 0.4);
   background: var(--surface);
   font-size: 1rem;
+  color: var(--text);
 }
 
 .progress {
@@ -367,6 +400,11 @@ function handleExitExam() {
 
   .top-bar__controls {
     gap: 0.75rem;
+  }
+
+  .history-button {
+    width: 100%;
+    text-align: center;
   }
 
   .progress {

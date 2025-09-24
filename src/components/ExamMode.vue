@@ -104,8 +104,10 @@
             <div class="exam-result__content">
               <p class="exam-result__prompt">{{ detail.prompt }}</p>
               <p class="exam-result__answer">
-                您的答案：<strong>{{ formatChoice(detail.selectedIndex) }}</strong>
-                <span v-if="!detail.isCorrect"> · 正確答案：<strong>{{ formatChoice(detail.correctIndex) }}</strong></span>
+                您的答案：<strong>{{ formatAnswer(detail.selectedIndex, detail.selectedText) }}</strong>
+                <span v-if="!detail.isCorrect">
+                  · 正確答案：<strong>{{ formatAnswer(detail.correctIndex, detail.correctText) }}</strong>
+                </span>
               </p>
             </div>
           </li>
@@ -224,9 +226,12 @@ function handleExit() {
   emit('exit');
 }
 
-function formatChoice(value) {
-  if (value === null || value === undefined) return '未作答';
-  return `${value}`;
+function formatAnswer(index, text) {
+  if (index === null || index === undefined) return '未作答';
+  if (text) {
+    return `${index}. ${text}`;
+  }
+  return `${index}`;
 }
 
 onUnmounted(() => {
@@ -276,6 +281,8 @@ onUnmounted(() => {
   border-radius: 0.85rem;
   border: 1px solid rgba(148, 163, 184, 0.4);
   font-size: 1rem;
+  color: var(--text);
+  background: var(--surface);
 }
 
 .exam-start__hint {
@@ -464,6 +471,7 @@ onUnmounted(() => {
   background: var(--surface-muted);
   text-align: left;
   font-size: 1rem;
+  color: var(--text);
   transition: border 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -488,11 +496,13 @@ onUnmounted(() => {
   background: #fff;
   border: 2px solid rgba(15, 23, 42, 0.08);
   font-weight: 600;
+  color: var(--brand-color-dark);
 }
 
 .exam-choice__text {
   flex: 1;
   line-height: 1.5;
+  color: inherit;
 }
 
 .exam-session__footer {

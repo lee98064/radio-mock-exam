@@ -56,3 +56,22 @@ export async function saveExamAttempt(attempt) {
     return false;
   }
 }
+
+export async function getExamAttempts() {
+  try {
+    const db = await getDatabase();
+    const tx = db.transaction(STORE_NAME, 'readonly');
+    const store = tx.objectStore(STORE_NAME);
+    const request = store.getAll();
+    const result = await new Promise((resolve, reject) => {
+      request.onsuccess = () => resolve(request.result ?? []);
+      request.onerror = () => reject(request.error ?? new Error('無法讀取考試紀錄'));
+    });
+    return result
+      .filter(Boolean)
+      .sort((a, b) => (b.finishedAt ?? 0) - (a.finishedAt ?? 0));
+  } catch (error) {
+    console.warn('[historyStorage] 取得考試紀錄失敗', error);
+    throw error;
+  }
+}
